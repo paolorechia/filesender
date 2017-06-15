@@ -10,10 +10,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
+#include <unistd.h>
 /* Cabeçalhos para socket em Linux */
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define PORTA 2048
 
@@ -51,21 +54,30 @@ int main(int argc, char **argv) {
 	connect(socket_descritor, (struct sockaddr*) &remoto, size_remoto);
 
 	/* Função de recebimento recv */
-	while(1) {
-
-		if((size= recv(socket_descritor, buffer, 4096, 0)) > 0) {
-			buffer[size]= '\0';
-			printf("Mensagem do servidor: %s\n", buffer);
-		}
+    int i = 0;
+    int test;
+    int numBlocks = 3;
+    if((size= recv(socket_descritor, buffer, 4096, 0)) > 0) {
+        buffer[size]= '\0';
+        printf("Mensagem do servidor: %s\n", buffer);
+    }
+    printf("Vamos pedir... %d\n", numBlocks);
+    memset(buffer, 0x0, 4096);
+    sprintf(buffer, "%d", numBlocks);
+    send(socket_descritor, buffer, strlen(buffer), 0);
+	while(i < numBlocks) {
+        printf("Bloco: %d\n", i);
 
 		memset(buffer, 0x0, 4096);
 		/* Entrada do Teclado */
 		fgets(buffer, 4096, stdin);
 
 		/* Enviando os dados do teclado */
-		send(socket_descritor, buffer, strlen(buffer), 0);
-
-		break;
+		test = send(socket_descritor, buffer, strlen(buffer), 0);
+        printf("Sent:%d\n", test);
+        if (test < 0){
+            printf("Failed to send:%d\n", test); }
+        i++;
 	}
 
 	close(socket_descritor);

@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 /* Cabeçalhos para socket em Linux */
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -77,16 +78,23 @@ int main(int argc, char **argv) {
 	}
 
 	/* Enviando mensagem ao cliente */
-	strcpy(buffer, "Bem Vindo!");
+	strcpy(buffer, "Bem Vindo! Quantos blocos de 4096 bytes?");
 
 	/* Função de envio send - MAN SEND */
 
+    int i = 0;
+    int numBlocks;
 	if(send(client_descritor, buffer, strlen(buffer), 0)) {
 
-		printf("Esperando mensagem do cliente...\n");
+		printf("Esperando numero de blocos do cliente...\n");
+        if((size= recv(client_descritor, buffer, 4096, 0)) > 0) {
+            buffer[size]= '\0';
+            numBlocks=atoi(buffer);
+            printf("Total de blocos: %d\n", numBlocks);
+        }
 
 		/* Função de recebimento recv - MAN RECV */
-		while(1) {
+		while(i < numBlocks) {
 
 			//Limpando o Buffer antes de receber a mensagem
 			memset(buffer, 0x0, 4096);
@@ -96,14 +104,14 @@ int main(int argc, char **argv) {
 				printf("Mensagem do cliente: %s\n", buffer);
 
 				/* Encerrar a conexão com cliente */
-				close(client_descritor);
-				break;
 			}
+            i++;
 		}
+		close(client_descritor);
 	}
 
 	close(socket_descritor);
-	printf("Serviço de socket finalizado!");
+	printf("\nServiço de socket finalizado!\n");
 
 	return EXIT_SUCCESS;
 }
