@@ -92,6 +92,9 @@ int main(int argc, char **argv) {
             numBlocks=atoi(buffer);
             printf("Total de blocos: %d\n", numBlocks);
         }
+        // Abre arquivo de saida
+        FILE * arquivoSaida;
+        arquivoSaida = fopen("arquivoSaida.bin", "wb");
 
 		/* Função de recebimento recv - MAN RECV */
 		while(i < numBlocks) {
@@ -103,8 +106,8 @@ int main(int argc, char **argv) {
 				buffer[size]= '\0';
 				printf("Mensagem do cliente: %s\n", buffer);
 
-				/* Encerrar a conexão com cliente */
 			}
+            fwrite(buffer, sizeof(char), sizeof(buffer), arquivoSaida);
             i++;
 		}
 		close(client_descritor);
