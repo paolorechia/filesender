@@ -21,7 +21,7 @@
 
 /* Usuário linux padrão só pode abrir portas acima de 1024 */
 #define PORTA 2048
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 8192
 
 /* Estrutura servidor local */
 struct sockaddr_in local;
@@ -36,6 +36,7 @@ int main(int argc, char **argv) {
 	int size;
 
     char buffer[BUFFER_SIZE];
+    char * ACK = "ACKNOWLEDGE";
     size_t bytesReceived;
     // Arquivo 
     FILE * saida;
@@ -98,7 +99,7 @@ int main(int argc, char **argv) {
             sprintf(output_name, "copia_%s", buffer);
 		    printf("%s\n", output_name);
         }
-	    if(send(client_descritor, buffer, strlen(buffer), 0)){
+	    if(send(client_descritor, ACK, strlen(ACK), 0)){
         }
 		printf("Esperando numero de blocos do cliente... ");
         if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
@@ -106,20 +107,20 @@ int main(int argc, char **argv) {
             numBlocks=atoi(buffer);
             printf("%d\n", numBlocks);
         }
-	    if(send(client_descritor, buffer, strlen(buffer), 0)){
+	    if(send(client_descritor, ACK, strlen(ACK), 0)){
         }
         // Abre arquivo de saida
         saida = fopen(output_name, "wb");
 		/* Função de recebimento recv - MAN RECV */
 		while(i < numBlocks) {
 			//Limpando o Buffer antes de receber a mensagem
-			memset(buffer, 0x0, 4096);
-			if((size= recv(client_descritor, buffer, 4096, 0)) > 0) {
+			memset(buffer, 0x0, BUFFER_SIZE);
+			if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
                 fwrite(buffer, sizeof(char), size, saida);
                 printf("Bloco:%d -- Recebido %d bytes\n", i, size);
             }
             i++;
-            if(send(client_descritor, buffer, BUFFER_SIZE, 0)){
+            if(send(client_descritor, ACK, strlen(ACK), 0)){
             }
 		}
 		close(client_descritor);
