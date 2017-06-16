@@ -103,11 +103,10 @@ int main(int argc, char **argv) {
             printf("Failed to send:%d\n", test); }
         i++;
     }
-    if((size= recv(socket_descritor, ACK, strlen(ACK), 0)) > 0){
+    shutdown(socket_descritor, SHUT_WR);
+    while ((size= recv(socket_descritor, ACK, strlen(ACK), 0)) > 0){
     }
-
     fclose(entrada);
-    while (1);
 	close(socket_descritor);
 	printf("\nCliente finalizado!\n");
 

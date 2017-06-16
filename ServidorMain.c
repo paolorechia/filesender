@@ -121,8 +121,9 @@ int main(int argc, char **argv) {
             }
             i++;
 		}
-        if(send(client_descritor, ACK, strlen(ACK), 0)){
-        }
+        shutdown(socket_descritor, SHUT_RD);
+//        if(send(client_descritor, ACK, strlen(ACK), 0)){
+//        }
 		close(client_descritor);
 	}
 
