@@ -21,7 +21,7 @@
 
 /* Usuário linux padrão só pode abrir portas acima de 1024 */
 #define PORTA 2048
-#define BUFFER_SIZE 8192
+#define BUFFER_SIZE 4096
 
 /* Estrutura servidor local */
 struct sockaddr_in local;
@@ -120,9 +120,9 @@ int main(int argc, char **argv) {
                 printf("Bloco:%d -- Recebido %d bytes\n", i, size);
             }
             i++;
-            if(send(client_descritor, ACK, strlen(ACK), 0)){
-            }
 		}
+        if(send(client_descritor, ACK, strlen(ACK), 0)){
+        }
 		close(client_descritor);
 	}
 
