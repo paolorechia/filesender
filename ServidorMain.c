@@ -21,6 +21,7 @@
 
 /* Usuário linux padrão só pode abrir portas acima de 1024 */
 #define PORTA 2048
+#define BUFFER_SIZE 4096
 
 /* Estrutura servidor local */
 struct sockaddr_in local;
@@ -32,9 +33,14 @@ int main(int argc, char **argv) {
 	/* Descritor para comunicação socket */
 	int socket_descritor;
 	int client_descritor;
-
 	int size;
-	char buffer[4096];
+
+    char buffer[BUFFER_SIZE];
+    size_t bytesReceived;
+    // Arquivo 
+    FILE * saida;
+    long fileSize;
+
 
 	/* Socket sobre o TCP - MAN SOCKET */
 	socket_descritor= socket(AF_INET, SOCK_STREAM, 0);
@@ -78,36 +84,36 @@ int main(int argc, char **argv) {
 	}
 
 	/* Enviando mensagem ao cliente */
-	strcpy(buffer, "Bem Vindo! Quantos blocos de 4096 bytes?");
+	strcpy(buffer, "Bem Vindo! Mande-me: nome do arquivo e numero de blocos"); 
 
 	/* Função de envio send - MAN SEND */
 
     int i = 0;
     int numBlocks;
+    char output_name[BUFFER_SIZE];
 	if(send(client_descritor, buffer, strlen(buffer), 0)) {
-
-		printf("Esperando numero de blocos do cliente...\n");
-        if((size= recv(client_descritor, buffer, 4096, 0)) > 0) {
+		printf("Esperando nome do arquivo... ");
+        if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
+            buffer[size]= '\0';
+            sprintf(output_name, "copia_%s", buffer);
+		    printf("%s\n", output_name);
+        }
+		printf("Esperando numero de blocos do cliente... ");
+        if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
             buffer[size]= '\0';
             numBlocks=atoi(buffer);
-            printf("Total de blocos: %d\n", numBlocks);
+            printf("%d\n", numBlocks);
         }
         // Abre arquivo de saida
-        FILE * arquivoSaida;
-        arquivoSaida = fopen("arquivoSaida.bin", "wb");
-
+        saida = fopen(output_name, "wb");
 		/* Função de recebimento recv - MAN RECV */
 		while(i < numBlocks) {
-
 			//Limpando o Buffer antes de receber a mensagem
 			memset(buffer, 0x0, 4096);
-
 			if((size= recv(client_descritor, buffer, 4096, 0)) > 0) {
-				buffer[size]= '\0';
-				printf("Mensagem do cliente: %s\n", buffer);
-
-			}
-            fwrite(buffer, sizeof(char), sizeof(buffer), arquivoSaida);
+                fwrite(buffer, sizeof(char), size, saida);
+                printf("Recebido %d bytes\n", size);
+            }
             i++;
 		}
 		close(client_descritor);
