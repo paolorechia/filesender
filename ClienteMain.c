@@ -80,11 +80,17 @@ int main(int argc, char **argv) {
     memset(buffer, 0x0, BUFFER_SIZE);
     sprintf(buffer, "%s", argv[1]);
     send(socket_descritor, buffer, strlen(buffer), 0);
+    if((size= recv(socket_descritor, buffer, 4096, 0)) > 0){
+
+    }
 
     printf("Separamos o arquivo em %d blocos...\n", numBlocks);
     memset(buffer, 0x0, BUFFER_SIZE);
     sprintf(buffer, "%d", numBlocks);
     send(socket_descritor, buffer, strlen(buffer), 0);
+    if((size= recv(socket_descritor, buffer, 4096, 0)) > 0){
+
+    }
 	while(i < numBlocks) {
         printf("Bloco: %d\n", i);
 		memset(buffer, 0x0, BUFFER_SIZE);
@@ -92,11 +98,11 @@ int main(int argc, char **argv) {
         bytesRead = fread(buffer,1,BUFFER_SIZE, entrada);
 		// Envia buffer para o servidor
 		test = send(socket_descritor, buffer, bytesRead, 0);
-
         printf("Enviados %d bytes\n", test);
         if (test < 0){
             printf("Failed to send:%d\n", test); }
         i++;
+        recv(socket_descritor, buffer, 4096, 0);
 	}
 
     fclose(entrada);

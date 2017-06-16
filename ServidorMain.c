@@ -98,11 +98,15 @@ int main(int argc, char **argv) {
             sprintf(output_name, "copia_%s", buffer);
 		    printf("%s\n", output_name);
         }
+	    if(send(client_descritor, buffer, strlen(buffer), 0)){
+        }
 		printf("Esperando numero de blocos do cliente... ");
         if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
             buffer[size]= '\0';
             numBlocks=atoi(buffer);
             printf("%d\n", numBlocks);
+        }
+	    if(send(client_descritor, buffer, strlen(buffer), 0)){
         }
         // Abre arquivo de saida
         saida = fopen(output_name, "wb");
@@ -115,6 +119,8 @@ int main(int argc, char **argv) {
                 printf("Recebido %d bytes\n", size);
             }
             i++;
+            if(send(client_descritor, buffer, strlen(buffer), 0)){
+            }
 		}
 		close(client_descritor);
 	}
