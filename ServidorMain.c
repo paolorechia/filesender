@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
                 printf("Bloco:%d -- Recebido %d bytes\n", i, size);
             }
             i++;
-            if(send(client_descritor, buffer, strlen(buffer), 0)){
+            if(send(client_descritor, buffer, BUFFER_SIZE, 0)){
             }
 		}
 		close(client_descritor);
