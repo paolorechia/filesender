@@ -12,6 +12,9 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+// Cabecalhos da China
+#include <sys/ioctl.h>
+#include <linux/sockios.h>
 /* Cabeçalhos para socket em Linux */
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -21,12 +24,36 @@
 #define PORTA 2048
 #define BUFFER_SIZE 4096
 #define IP_ADDR "127.0.0.1"
+#define LINGER 1
+#define LINGER_TIME 120 
+
+void depleteSendBuffer(int fd) 
+{
+	int lastOutstanding=-1;
+	for(;;) {
+		int outstanding;
+		ioctl(fd, SIOCOUTQ, &outstanding);
+		if(outstanding != lastOutstanding) 
+			printf("Outstanding: %d\n", outstanding);
+		lastOutstanding = outstanding;
+		if(!outstanding)
+			break;
+		usleep(1000);
+	}
+}
+
 struct sockaddr_in remoto;
 
+
 int main(int argc, char **argv) {
+    struct linger so_linger;
+
+    so_linger.l_onoff=LINGER;
+    so_linger.l_linger=LINGER_TIME;
 
 	/* Descritor para comunicação socket */
 	int socket_descritor;
+    int set;
 
 	int size;
 	char buffer[BUFFER_SIZE];
@@ -56,6 +83,17 @@ int main(int argc, char **argv) {
 		perror("ERRO: Socket Descritor!\n");
 		exit(EXIT_FAILURE);
 	}
+    set = setsockopt(
+           socket_descritor,
+           SOL_SOCKET,
+           SO_LINGER,
+           &so_linger,
+           sizeof (so_linger)
+        );
+    if (set){
+        printf("Could not set up linger time\n");
+        return -1;
+    }
 
 	/* Prenchendo a estrutura de dados  */
 	remoto.sin_family= AF_INET;
@@ -103,10 +141,20 @@ int main(int argc, char **argv) {
             printf("Failed to send:%d\n", test); }
         i++;
     }
-    shutdown(socket_descritor, SHUT_WR);
-    while ((size= recv(socket_descritor, ACK, strlen(ACK), 0)) > 0){
-    }
     fclose(entrada);
+    shutdown(socket_descritor, SHUT_WR);
+    depleteSendBuffer(socket_descritor);
+    for (;;){
+	test=read(socket_descritor, buffer, sizeof(buffer));
+		if(test < 0) {
+			perror("reading");
+			exit(1);
+		}
+		if(!test) {
+			printf("Correct EOF\n");
+			break;
+		}
+    }
 	close(socket_descritor);
 	printf("\nCliente finalizado!\n");
 
