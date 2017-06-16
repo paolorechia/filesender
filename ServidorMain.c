@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
 			memset(buffer, 0x0, 4096);
 			if((size= recv(client_descritor, buffer, 4096, 0)) > 0) {
                 fwrite(buffer, sizeof(char), size, saida);
-                printf("Recebido %d bytes\n", size);
+                printf("Bloco:%d -- Recebido %d bytes\n", i, size);
             }
             i++;
             if(send(client_descritor, buffer, strlen(buffer), 0)){

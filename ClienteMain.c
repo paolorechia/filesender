@@ -92,13 +92,12 @@ int main(int argc, char **argv) {
 
     }
 	while(i < numBlocks) {
-        printf("Bloco: %d\n", i);
 		memset(buffer, 0x0, BUFFER_SIZE);
         // Le BUFFER_SIZE bytes do arquivo de entrada
         bytesRead = fread(buffer,1,BUFFER_SIZE, entrada);
 		// Envia buffer para o servidor
 		test = send(socket_descritor, buffer, bytesRead, 0);
-        printf("Enviados %d bytes\n", test);
+        printf("Bloco:%d - Enviados %d bytes\n", i, test);
         if (test < 0){
             printf("Failed to send:%d\n", test); }
         i++;
