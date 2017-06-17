@@ -27,6 +27,13 @@
 #define LINGER 1
 #define LINGER_TIME 120 
 
+/* depleteSendBuffer 
+  Funcao escrita por Bert Hubert, Netherlabs Computer Consulting BV - bert.hubert@netherlabs.nl
+  Tem como objetivo esperar que todos os bytes da fila de saida sejam efetiva
+  mente enviados.
+  A chamada dessa funcao antes do close(socket) garante que Sistema Operacional
+  nao desaloca a fila de envio antes que todos os bytes sejam enviados. 
+*/
 void depleteSendBuffer(int fd) 
 {
 	int lastOutstanding=-1;
@@ -34,7 +41,7 @@ void depleteSendBuffer(int fd)
 		int outstanding;
 		ioctl(fd, SIOCOUTQ, &outstanding);
 		if(outstanding != lastOutstanding) 
-			printf("Outstanding: %d\n", outstanding);
+			printf("Esperando enviar...: %d\n", outstanding);
 		lastOutstanding = outstanding;
 		if(!outstanding)
 			break;
