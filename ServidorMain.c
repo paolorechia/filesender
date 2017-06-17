@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     size_t bytesReceived;
     // Arquivo 
     FILE * saida;
-    long fileSize;
+    long long fileSize;
 
 
 	/* Socket sobre o TCP - MAN SOCKET */
@@ -89,9 +89,8 @@ int main(int argc, char **argv) {
 
 	/* Função de envio send - MAN SEND */
 
-    int i = 0;
-    int numBlocks;
     char output_name[BUFFER_SIZE];
+    int bytesRead = 0;
 	if(send(client_descritor, buffer, strlen(buffer), 0)) {
 		printf("Esperando nome do arquivo... ");
         if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
@@ -101,26 +100,31 @@ int main(int argc, char **argv) {
         }
 	    if(send(client_descritor, ACK, strlen(ACK), 0)){
         }
-		printf("Esperando numero de blocos do cliente... ");
+		printf("Esperando tamanho do arquivo cliente... ");
         if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
             buffer[size]= '\0';
-            numBlocks=atoi(buffer);
-            printf("%d\n", numBlocks);
+            fileSize=atoi(buffer);
+            printf("%d\n", fileSize);
         }
 	    if(send(client_descritor, ACK, strlen(ACK), 0)){
         }
         // Abre arquivo de saida
         saida = fopen(output_name, "wb");
 		/* Função de recebimento recv - MAN RECV */
-		while(i < numBlocks) {
+		while(bytesRead < fileSize) {
 			//Limpando o Buffer antes de receber a mensagem
 			memset(buffer, 0x0, BUFFER_SIZE);
 			if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
                 fwrite(buffer, sizeof(char), size, saida);
-                printf("Bloco:%d -- Recebido %d bytes\n", i, size);
+                printf("Recebido: %d/%d bytes\n", bytesRead, fileSize);
+                bytesRead += size;
             }
-            i++;
+            else{
+                printf("Error receiving!\n");
+                exit(1);
+            }
 		}
+        printf("Recebido: %d/%d bytes\n", bytesRead, fileSize);
         shutdown(socket_descritor, SHUT_RD);
 //        if(send(client_descritor, ACK, strlen(ACK), 0)){
 //        }
