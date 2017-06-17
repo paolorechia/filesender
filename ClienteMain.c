@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
     
 
     // Verifica que ha um argumento passado
-    if (argc < 2){
+    if (argc < 3){
         printf("Usage: %s filename [ip address]\n", argv[0]);
         return -1;
     }
@@ -102,10 +102,6 @@ int main(int argc, char **argv) {
     printf("%s\n", argv[2]);
     // Trata como endereco IP
     remoto.sin_addr.s_addr= inet_addr(argv[2]); //Endereço do Servidor
-    // Senao envia para Localhost (127.0.0.1)
-    else{
-        remoto.sin_addr.s_addr= inet_addr(LOCALHOST); //Endereço do Servidor
-    }
 	memset(remoto.sin_zero, 0x0, 8);
 	int size_remoto= sizeof(remoto);
 
