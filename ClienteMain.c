@@ -99,11 +99,9 @@ int main(int argc, char **argv) {
 	remoto.sin_family= AF_INET;
 	remoto.sin_port= htons(PORTA); //Converte portas para endereço de rede
     // Se argumento 2 foi passado
-    if (argc > 2){
-        printf("%s\n", argv[2]);
-        // Trata como endereco IP
-        remoto.sin_addr.s_addr= inet_addr(argv[2]); //Endereço do Servidor
-    }
+    printf("%s\n", argv[2]);
+    // Trata como endereco IP
+    remoto.sin_addr.s_addr= inet_addr(argv[2]); //Endereço do Servidor
     // Senao envia para Localhost (127.0.0.1)
     else{
         remoto.sin_addr.s_addr= inet_addr(LOCALHOST); //Endereço do Servidor
