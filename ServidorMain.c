@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
         printf("filesize: %s bytes\n", fileSizeString);
         fileSize = atoll(fileSizeString);
         
-        printf("Recebendo\n");
+        printf("Recebendo");
         // Abre arquivo de saida
         saida = fopen(output_name, "wb");
         // Recebe bytes enquanto nao atingir o tamanho do arquivo
@@ -151,7 +151,10 @@ int main(int argc, char **argv) {
                 bytesRead += size;
                 // Imprime barra de progresso
                 if (bytesRead > progressBar * j){
+                    // Apaga linha
                     printf("\r");
+                    // Reescreve
+                    printf("Recebendo");
                     k = 0;
                     while ( k < j){
                         printf(".");

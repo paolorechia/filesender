@@ -215,7 +215,10 @@ int main(int argc, char **argv) {
             bytesSent += sent;
             // Imprime barra de progresso
             if (bytesSent > progressBar * i){
+                // Apaga linha
                 printf("\r");
+                // Reescreve
+                printf("Enviando");
                 k = 0;
                 while ( k < i){
                     printf(".");
