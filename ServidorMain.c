@@ -93,15 +93,48 @@ int main(int argc, char **argv) {
 
 	/* Função de envio send - MAN SEND */
 
-    char output_name[];
+    char received_name[FILENAME_MAXSIZE];
+    char output_name[FILENAME_MAXSIZE + 5];
+    char fileSizeString[FILESIZE_MAXSIZE];
+    char aux;
+    int i = 0;
     int bytesRead = 0;
+	memset(header, 0x0, HEADER_SIZE);
 	if(send(client_descritor, buffer, strlen(buffer), 0)) {
 		printf("Esperando header... ");
-        if((size= recv(client_descritor, header, HEADER_SIZE, 0)) > 0) {
-            buffer[size]= '\0';
-            sprintf(output_name, "copia_%s", buffer);
-		    printf("%s\n", output_name);
+        while(size < HEADER_SIZE){
+            if((size = recv(client_descritor, header, HEADER_SIZE, 0)) > 0) {
+            size++;
+            }
         }
+        printf("%s\n", header);
+        aux = header[0];
+        while(aux != '@' && aux != '$'){
+            received_name[i]=aux;
+            i++;
+            aux = header[i];
+        }
+        received_name[i]='\0';
+        printf("filename: %s\n", received_name);
+        sprintf(output_name, "copia_%s", received_name);
+        printf("output name: %s\n", output_name);
+        int j = 0;
+        while (aux != '$'){
+            i++;
+            aux = header[i];
+        }
+        i++;
+        aux = header[i];
+        while (aux != '@'){
+            fileSizeString[j]=aux;
+            i++;
+            j++;
+            aux = header[i];
+        }
+        fileSizeString[j]='\0';
+        printf("filesize: %s\n", fileSizeString);
+        fileSize = atoll(fileSizeString);
+        
         // Abre arquivo de saida
         saida = fopen(output_name, "wb");
 		/* Função de recebimento recv - MAN RECV */

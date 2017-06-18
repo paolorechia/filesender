@@ -24,8 +24,8 @@
 #define PORTA 2048
 #define BUFFER_SIZE 4096
 #define FILENAME_MAXSIZE 200
-#define FILESIZE_MAX 200
-#define HEADER_SIZE FILENAME_MAXSIZE + FILESIZE_MAX
+#define FILESIZE_MAXSIZE 200
+#define HEADER_SIZE FILENAME_MAXSIZE + FILESIZE_MAXSIZE
 #define LOCALHOST "127.0.0.1"
 #define LINGER 1
 #define LINGER_TIME 120 
@@ -52,6 +52,13 @@ void depleteSendBuffer(int fd)
 	}
 }
 
+void buildHeaderString(char filename[FILENAME_MAXSIZE]){
+    for (int i = strlen(filename); i < FILENAME_MAXSIZE; i++){
+        filename[i]='@';
+    }
+    filename[FILENAME_MAXSIZE]='$';
+}
+
 struct sockaddr_in remoto;
 
 
@@ -67,12 +74,13 @@ int main(int argc, char **argv) {
 
 	int size;
 	char buffer[BUFFER_SIZE];
+    char filename[FILENAME_MAXSIZE];
+    char fileSizeString[FILESIZE_MAXSIZE];
     char header[HEADER_SIZE];
-    char * ACK = "ACKNOWLEDGE";
     FILE * entrada;
     long long fileSize;
     size_t bytesRead;
-    
+
 
     // Verifica que ha um argumento passado
     if (argc < 3){
@@ -86,6 +94,18 @@ int main(int argc, char **argv) {
     fseek(entrada , 0 , SEEK_END);
     fileSize = ftell(entrada);
     rewind(entrada);
+
+    sprintf(filename, "%s", argv[1]);
+    buildHeaderString(filename);
+    sprintf(fileSizeString, "%d", fileSize);
+    buildHeaderString(fileSizeString);
+    memset(header, 0x0, HEADER_SIZE);
+    strcat(header, filename);
+    strcat(header, fileSizeString);
+    header[HEADER_SIZE]='\0';
+    printf("%s\n", header);
+
+    printf("Nosso arquivo tem %d bytes...\n", fileSize);
 
 	printf("Cliente do serviço de Socket!\n");
 	socket_descritor= socket(AF_INET, SOCK_STREAM, 0);
@@ -126,20 +146,11 @@ int main(int argc, char **argv) {
         buffer[size]= '\0';
         printf("Mensagem do servidor: %s\n", buffer);
     }
-    memset(buffer, 0x0, BUFFER_SIZE);
-    sprintf(buffer, "%s", argv[1]);
-    send(socket_descritor, buffer, strlen(buffer), 0);
-    if((size= recv(socket_descritor, ACK, strlen(ACK), 0)) > 0){
 
-    }
+    if ((send(socket_descritor, header, HEADER_SIZE, 0)) > 0){
+        
+    };
 
-    printf("Nosso arquivo tem %d bytes...\n", fileSize);
-    memset(buffer, 0x0, BUFFER_SIZE);
-    sprintf(buffer, "%d", fileSize);
-    send(socket_descritor, buffer, strlen(buffer), 0);
-    if((size= recv(socket_descritor, ACK, strlen(ACK), 0)) > 0){
-
-    }
 	while(bytesSent < fileSize) {
 		memset(buffer, 0x0, BUFFER_SIZE);
         // Le BUFFER_SIZE bytes do arquivo de entrada
