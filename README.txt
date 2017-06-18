@@ -2,7 +2,7 @@
 ------------------------------------------------------------
 Projeto Pratico - Redes de Computadores I
 Prof. Michele Nogueira
-Alunos: L Ma....
+Alunos: Luis Mateus M. Bossi       - GRR 20151799
         Paolo Andreas Stall Rechia - GRR 20135196
 ------------------------------------------------------------
 ------------------------------------------------------------
