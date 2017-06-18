@@ -98,6 +98,8 @@ int main(int argc, char **argv) {
     char aux;
     int i = 0;
     int bytesRead = 0;
+    int j = 1;
+    int progressBar = fileSize/100;
 	memset(header, 0x0, HEADER_SIZE);
 	if(send(client_descritor, buffer, strlen(buffer), 0)) {
 		printf("Esperando header... ");
@@ -134,27 +136,37 @@ int main(int argc, char **argv) {
         printf("filesize: %s\n", fileSizeString);
         fileSize = atoll(fileSizeString);
         
+        printf("Iniciando recebimento...\n");
         // Abre arquivo de saida
         saida = fopen(output_name, "wb");
-		/* Função de recebimento recv - MAN RECV */
+        // Recebe bytes enquanto nao atingir o tamanho do arquivo
 		while(bytesRead < fileSize) {
 			//Limpando o Buffer antes de receber a mensagem
 			memset(buffer, 0x0, BUFFER_SIZE);
 			if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
                 fwrite(buffer, sizeof(char), size, saida);
-                printf("Recebido: %d/%d bytes\n", bytesRead, fileSize);
+           //     printf("Recebido: %d/%d bytes\n", bytesRead, fileSize);
                 bytesRead += size;
             }
             else{
                 printf("Error receiving!\n");
                 exit(1);
             }
+            if (bytesRead > progressBar * j){
+                printf(".");
+                j++;
+            }
 		}
+        printf(" finished!\n");
         printf("Recebido: %d/%d bytes\n", bytesRead, fileSize);
+        // Shutdown fecha a comunicacao para recebimento.
+        // Isso manda um pacote FIN para o cliente, que sinaliza 
+        // o termino da comunicacao.
         shutdown(socket_descritor, SHUT_RD);
+        // Desaloca socket
 		close(client_descritor);
 	}
-
+    // Desaloca socket
 	close(socket_descritor);
 	printf("\nServiço de socket finalizado!\n");
 

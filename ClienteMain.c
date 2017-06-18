@@ -183,7 +183,11 @@ int main(int argc, char **argv) {
         printf("Nao foi possivel enviar o header:\n %s\n", header);
     }
 
+    // bytesSent = bytes enviados
     int bytesSent = 0;
+    int i = 1;
+    int progressBar = fileSize/100;
+    printf("Iniciando envio...\n");
 	while(bytesSent < fileSize) {
         // Limpa buffer
 		memset(buffer, 0x0, BUFFER_SIZE);
@@ -191,7 +195,7 @@ int main(int argc, char **argv) {
         bytesRead = fread(buffer,1,BUFFER_SIZE, entrada);
 		// Envia buffer para a fila de envio
 		size = send(socket_descritor, buffer, bytesRead, 0);
-        printf("Enviados %d/%d bytes\n", bytesSent, fileSize);
+    //    printf("Enviados %d/%d bytes\n", bytesSent, fileSize);
         if (size < 0){
             printf("Nao foi possivel enviar bytes para fila de envio.\n", size);
             exit(1);
@@ -199,7 +203,12 @@ int main(int argc, char **argv) {
         else{
             bytesSent += size;
         }
+        if (bytesSent > progressBar * i){
+            printf(".");
+            i++;
+        }
     }
+    printf(" finished!\n");
     printf("Enviados %d/%d bytes\n", bytesSent, fileSize);
     // Arquivo inteiro lido, desaloca memoria
     fclose(entrada);
