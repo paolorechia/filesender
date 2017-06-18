@@ -197,6 +197,7 @@ int main(int argc, char **argv) {
     long long bytesSent = 0;
     size_t bytesRead;
     int i = 1;
+    int k;
     long long progressBar = fileSize/100;
     printf("Enviando");
 	while(bytesSent < fileSize) {
@@ -212,8 +213,20 @@ int main(int argc, char **argv) {
         }
         else{
             bytesSent += sent;
+            // Imprime barra de progresso
             if (bytesSent > progressBar * i){
-                printf(".");
+                printf("\r");
+                k = 0;
+                while ( k < i){
+                    printf(".");
+                    k++;
+                }
+                k = 0;
+                while ( k < 100 - i){
+                    printf(" ");
+                    k++;
+                }
+                printf("%d%%", i);
                 fflush(stdout);
                 i++;
             }

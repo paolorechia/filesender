@@ -135,11 +135,12 @@ int main(int argc, char **argv) {
         printf("filesize: %s bytes\n", fileSizeString);
         fileSize = atoll(fileSizeString);
         
-        printf("Recebendo");
+        printf("Recebendo\n");
         // Abre arquivo de saida
         saida = fopen(output_name, "wb");
         // Recebe bytes enquanto nao atingir o tamanho do arquivo
         j = 1;
+        int k;
         long long progressBar = fileSize/100;
         long long bytesRead = 0;
 		while(bytesRead < fileSize) {
@@ -148,8 +149,20 @@ int main(int argc, char **argv) {
 			if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
                 fwrite(buffer, sizeof(char), size, saida);
                 bytesRead += size;
+                // Imprime barra de progresso
                 if (bytesRead > progressBar * j){
-                    printf(".");
+                    printf("\r");
+                    k = 0;
+                    while ( k < j){
+                        printf(".");
+                        k++;
+                    }
+                    k = 0;
+                    while ( k < 100 - j){
+                        printf(" ");
+                        k++;
+                    }
+                    printf("%d%%", j);
                     fflush(stdout);
                     j++;
                 }
