@@ -98,8 +98,6 @@ int main(int argc, char **argv) {
     char aux;
     int i = 0;
     int bytesRead = 0;
-    int j = 1;
-    int progressBar = fileSize/100;
 	memset(header, 0x0, HEADER_SIZE);
 	if(send(client_descritor, buffer, strlen(buffer), 0)) {
 		printf("Esperando header... ");
@@ -140,6 +138,8 @@ int main(int argc, char **argv) {
         // Abre arquivo de saida
         saida = fopen(output_name, "wb");
         // Recebe bytes enquanto nao atingir o tamanho do arquivo
+        j = 1;
+        int progressBar = fileSize/100;
 		while(bytesRead < fileSize) {
 			//Limpando o Buffer antes de receber a mensagem
 			memset(buffer, 0x0, BUFFER_SIZE);
