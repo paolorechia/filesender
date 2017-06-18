@@ -86,17 +86,17 @@ int main(int argc, char **argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	/* Enviando mensagem ao cliente */
-	strcpy(buffer, "Bem Vindo! Esperando o header...");
-
-	/* Função de envio send - MAN SEND */
 
     char received_name[FILENAME_MAXSIZE];
     char output_name[FILENAME_MAXSIZE + 6];
     char fileSizeString[FILESIZE_MAXSIZE];
     char aux;
     int i = 0;
+
 	memset(header, 0x0, HEADER_SIZE);
+    memset(buffer, 0x0, BUFFER_SIZE);
+	/* Enviando mensagem ao cliente */
+	strcpy(buffer, "Bem Vindo! Esperando o header...");
 	if(send(client_descritor, buffer, strlen(buffer), 0)) {
 		printf("Esperando header...");
         while(size < HEADER_SIZE){
