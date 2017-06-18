@@ -147,14 +147,15 @@ int main(int argc, char **argv) {
                 fwrite(buffer, sizeof(char), size, saida);
            //     printf("Recebido: %d/%d bytes\n", bytesRead, fileSize);
                 bytesRead += size;
+                if (bytesRead > progressBar * j){
+                    printf(".");
+                    fflush(stdout);
+                    j++;
+                }
             }
             else{
                 printf("Error receiving!\n");
                 exit(1);
-            }
-            if (bytesRead > progressBar * j){
-                printf(".");
-                j++;
             }
 		}
         printf(" finished!\n");

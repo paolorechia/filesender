@@ -202,10 +202,11 @@ int main(int argc, char **argv) {
         }
         else{
             bytesSent += size;
-        }
-        if (bytesSent > progressBar * i){
-            printf(".");
-            i++;
+            if (bytesSent > progressBar * i){
+                printf(".");
+                fflush(stdout);
+                i++;
+            }
         }
     }
     printf(" finished!\n");
