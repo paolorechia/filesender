@@ -40,7 +40,6 @@ int main(int argc, char **argv) {
 
     char header[HEADER_SIZE];
     char buffer[BUFFER_SIZE];
-    char * ACK = "ACKNOWLEDGE";
     size_t bytesReceived;
     // Arquivo 
     FILE * saida;
@@ -94,7 +93,7 @@ int main(int argc, char **argv) {
 	/* Função de envio send - MAN SEND */
 
     char received_name[FILENAME_MAXSIZE];
-    char output_name[FILENAME_MAXSIZE + 5];
+    char output_name[FILENAME_MAXSIZE + 6];
     char fileSizeString[FILESIZE_MAXSIZE];
     char aux;
     int i = 0;
@@ -125,7 +124,7 @@ int main(int argc, char **argv) {
         }
         i++;
         aux = header[i];
-        while (aux != '@'){
+        while (aux != '@' && aux != '\0'){
             fileSizeString[j]=aux;
             i++;
             j++;
@@ -153,8 +152,6 @@ int main(int argc, char **argv) {
 		}
         printf("Recebido: %d/%d bytes\n", bytesRead, fileSize);
         shutdown(socket_descritor, SHUT_RD);
-//        if(send(client_descritor, ACK, strlen(ACK), 0)){
-//        }
 		close(client_descritor);
 	}
 
