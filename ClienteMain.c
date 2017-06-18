@@ -181,7 +181,7 @@ int main(int argc, char **argv) {
         printf("Servidor: %s", buffer);
     }
     else{
-        printf("Nao foi possivel receber mensagem do servidor\n");
+        printf("\nNao foi possivel receber mensagem do servidor\n");
     }
 
     /* Manda header para fila de envio */
@@ -189,7 +189,7 @@ int main(int argc, char **argv) {
         printf(" enviado!\n");
     }
     else{
-        printf("Nao foi possivel enviar o header:\n %s\n", header);
+        printf("\nNao foi possivel enviar o header.\n");
     }
 
     // bytesSent = bytes enviados
@@ -207,7 +207,7 @@ int main(int argc, char **argv) {
 		// Envia buffer para a fila de envio
 		sent = send(socket_descritor, buffer, bytesRead, 0);
         if (sent < 0){
-            printf("Nao foi possivel enviar bytes para fila de envio.\n");
+            printf("\nNao foi possivel enviar bytes para fila de envio.\n");
             exit(1);
         }
         else{

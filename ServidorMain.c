@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
         printf("filesize: %s bytes\n", fileSizeString);
         fileSize = atoll(fileSizeString);
         
-        printf("Iniciando recebimento");
+        printf("Recebendo");
         // Abre arquivo de saida
         saida = fopen(output_name, "wb");
         // Recebe bytes enquanto nao atingir o tamanho do arquivo
@@ -156,7 +156,7 @@ int main(int argc, char **argv) {
 //                printf("Recebido: %lli/%lli bytes\n", bytesRead, fileSize);
             }
             else{
-                printf("Error receiving!\n");
+                printf("\nError receiving!\n");
                 exit(1);
             }
 		}
