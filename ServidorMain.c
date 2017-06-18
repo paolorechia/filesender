@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
             aux = header[i];
         }
         fileSizeString[j]='\0';
-        printf("filesize: %s\n", fileSizeString);
+        printf("filesize: %s bytes\n", fileSizeString);
         fileSize = atoll(fileSizeString);
         
         printf("Iniciando recebimento...\n");

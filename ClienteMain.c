@@ -12,7 +12,7 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
-// Cabecalhos da China
+// Cabecalhos depleteSendBuffer
 #include <sys/ioctl.h>
 #include <linux/sockios.h>
 /* Cabeçalhos para socket em Linux */
@@ -34,20 +34,25 @@
   Funcao escrita por Bert Hubert, Netherlabs Computer Consulting BV - bert.hubert@netherlabs.nl
   Tem como objetivo esperar que todos os bytes da fila de saida sejam efetiva
   mente enviados.
-  A chamada dessa funcao antes do close(socket) garante que Sistema Operacional
+  A chamada dessa funcao antes do close(socket) garante que o Sistema Operacional
   nao desaloca a fila de envio antes que todos os bytes sejam enviados. 
+  Só funciona para Linux.
 */
 void depleteSendBuffer(int fd) 
 {
 	int lastOutstanding=-1;
+    printf("Esvaziando fila de envio...");
 	for(;;) {
 		int outstanding;
 		ioctl(fd, SIOCOUTQ, &outstanding);
 		if(outstanding != lastOutstanding) 
-			printf("Esvaziando fila de envio... %d\n", outstanding);
 		lastOutstanding = outstanding;
-		if(!outstanding)
+		if(!outstanding){
+            printf(" finished!\n");
 			break;
+        }
+        printf(".");
+        fflush(stdout);
 		usleep(1000);
 	}
 }
@@ -121,16 +126,15 @@ int main(int argc, char **argv) {
     // E obtem seu tamanho 
     fseek(entrada , 0 , SEEK_END);
     fileSize = ftell(entrada);
-    printf("Nosso arquivo tem %d bytes...\n", fileSize);
     rewind(entrada);
     sprintf(fileSizeString, "%d", fileSize);
     
     // Constroi header com o nome do arquivo e seu tamanho
     buildHeader(header, filename, fileSizeString);
-    printf("%s\n", header);
+    printf("Header construido: %s\n", header);
+    printf("Filesize: %d bytes...\n", fileSize);
 
     // Inicia servico Socket
-	printf("Cliente do serviço de Socket!\n");
 	socket_descritor= socket(AF_INET, SOCK_STREAM, 0);
 	if((socket_descritor == -1)) {
 
