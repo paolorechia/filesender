@@ -40,7 +40,6 @@ int main(int argc, char **argv) {
 
     char header[HEADER_SIZE];
     char buffer[BUFFER_SIZE];
-    size_t bytesReceived;
     // Arquivo 
     FILE * saida;
     long long fileSize;
@@ -97,16 +96,18 @@ int main(int argc, char **argv) {
     char fileSizeString[FILESIZE_MAXSIZE];
     char aux;
     int i = 0;
-    int bytesRead = 0;
 	memset(header, 0x0, HEADER_SIZE);
 	if(send(client_descritor, buffer, strlen(buffer), 0)) {
-		printf("Esperando header... ");
+		printf("Esperando header...");
         while(size < HEADER_SIZE){
             if((size = recv(client_descritor, header, HEADER_SIZE, 0)) > 0) {
-            size++;
+            }
+            else{
+                printf("Erro ao receber o header.\n");
+                exit(EXIT_FAILURE);
             }
         }
-        printf("%s\n", header);
+        printf(" recebido!\nHeader: %s\n", header);
         aux = header[0];
         while(aux != '@' && aux != '$'){
             received_name[i]=aux;
@@ -134,32 +135,33 @@ int main(int argc, char **argv) {
         printf("filesize: %s bytes\n", fileSizeString);
         fileSize = atoll(fileSizeString);
         
-        printf("Iniciando recebimento...\n");
+        printf("Iniciando recebimento");
         // Abre arquivo de saida
         saida = fopen(output_name, "wb");
         // Recebe bytes enquanto nao atingir o tamanho do arquivo
         j = 1;
-        int progressBar = fileSize/100;
+        long long progressBar = fileSize/100;
+        long long bytesRead = 0;
 		while(bytesRead < fileSize) {
 			//Limpando o Buffer antes de receber a mensagem
 			memset(buffer, 0x0, BUFFER_SIZE);
 			if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
                 fwrite(buffer, sizeof(char), size, saida);
-           //     printf("Recebido: %d/%d bytes\n", bytesRead, fileSize);
                 bytesRead += size;
                 if (bytesRead > progressBar * j){
                     printf(".");
                     fflush(stdout);
                     j++;
                 }
+//                printf("Recebido: %lli/%lli bytes\n", bytesRead, fileSize);
             }
             else{
                 printf("Error receiving!\n");
                 exit(1);
             }
 		}
-        printf(" finished!\n");
-        printf("Recebido: %d/%d bytes\n", bytesRead, fileSize);
+        printf(" terminado!\n");
+        printf("Recebidos: %lli bytes\n", bytesRead);
         // Shutdown fecha a comunicacao para recebimento.
         // Isso manda um pacote FIN para o cliente, que sinaliza 
         // o termino da comunicacao.

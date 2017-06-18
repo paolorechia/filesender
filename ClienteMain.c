@@ -27,7 +27,7 @@
 #define FILESIZE_MAXSIZE 200
 #define HEADER_SIZE FILENAME_MAXSIZE + FILESIZE_MAXSIZE
 #define LOCALHOST "127.0.0.1"
-#define LINGER 1
+#define LINGER 0
 #define LINGER_TIME 120 
 
 /* depleteSendBuffer 
@@ -41,18 +41,23 @@
 void depleteSendBuffer(int fd) 
 {
 	int lastOutstanding=-1;
-    printf("Esvaziando fila de envio...");
+    printf("Esvaziando fila de envio");
+    int i = 0;
 	for(;;) {
 		int outstanding;
 		ioctl(fd, SIOCOUTQ, &outstanding);
 		if(outstanding != lastOutstanding) 
 		lastOutstanding = outstanding;
 		if(!outstanding){
-            printf(" finished!\n");
+            printf(" terminado!\n");
 			break;
         }
-        printf(".");
-        fflush(stdout);
+        i++;
+
+        if ((i % 10 == 0)){
+            printf(".");
+            fflush(stdout);
+        }
 		usleep(1000);
 	}
 }
@@ -106,7 +111,6 @@ int main(int argc, char **argv) {
     char header[HEADER_SIZE];
     FILE * entrada;
     long long fileSize;
-    size_t bytesRead;
 
 
     // Verifica que ha um argumento passado
@@ -127,12 +131,12 @@ int main(int argc, char **argv) {
     fseek(entrada , 0 , SEEK_END);
     fileSize = ftell(entrada);
     rewind(entrada);
-    sprintf(fileSizeString, "%d", fileSize);
+    sprintf(fileSizeString, "%lli", fileSize);
     
     // Constroi header com o nome do arquivo e seu tamanho
     buildHeader(header, filename, fileSizeString);
-    printf("Header construido: %s\n", header);
-    printf("Filesize: %d bytes...\n", fileSize);
+    printf("Header: %s\n", header);
+    printf("Filesize: %lli bytes...\n", fileSize);
 
     // Inicia servico Socket
 	socket_descritor= socket(AF_INET, SOCK_STREAM, 0);
@@ -174,7 +178,7 @@ int main(int argc, char **argv) {
 	/* Le fila de bytes recebidos*/
     if((size= recv(socket_descritor, buffer, 4096, 0)) > 0) {
         buffer[size]= '\0';
-        printf("Mensagem do servidor: %s\n", buffer);
+        printf("Servidor: %s", buffer);
     }
     else{
         printf("Nao foi possivel receber mensagem do servidor\n");
@@ -182,39 +186,42 @@ int main(int argc, char **argv) {
 
     /* Manda header para fila de envio */
     if ((send(socket_descritor, header, HEADER_SIZE, 0)) > 0){
+        printf(" enviado!\n");
     }
     else{
         printf("Nao foi possivel enviar o header:\n %s\n", header);
     }
 
     // bytesSent = bytes enviados
-    int bytesSent = 0;
+    long long sent = 0;
+    long long bytesSent = 0;
+    size_t bytesRead;
     int i = 1;
-    int progressBar = fileSize/100;
-    printf("Iniciando envio...\n");
+    long long progressBar = fileSize/100;
+    printf("Enviando");
 	while(bytesSent < fileSize) {
         // Limpa buffer
 		memset(buffer, 0x0, BUFFER_SIZE);
         // Le BUFFER_SIZE bytes do arquivo de entrada
         bytesRead = fread(buffer,1,BUFFER_SIZE, entrada);
 		// Envia buffer para a fila de envio
-		size = send(socket_descritor, buffer, bytesRead, 0);
-    //    printf("Enviados %d/%d bytes\n", bytesSent, fileSize);
-        if (size < 0){
-            printf("Nao foi possivel enviar bytes para fila de envio.\n", size);
+		sent = send(socket_descritor, buffer, bytesRead, 0);
+        if (sent < 0){
+            printf("Nao foi possivel enviar bytes para fila de envio.\n");
             exit(1);
         }
         else{
-            bytesSent += size;
+            bytesSent += sent;
             if (bytesSent > progressBar * i){
                 printf(".");
                 fflush(stdout);
                 i++;
             }
+//            printf("Enviados %lli/%lli bytes\n", bytesSent, fileSize);
         }
     }
-    printf(" finished!\n");
-    printf("Enviados %d/%d bytes\n", bytesSent, fileSize);
+    printf(" terminado!\n");
+    printf("Enviados: %lli bytes\n", bytesSent);
     // Arquivo inteiro lido, desaloca memoria
     fclose(entrada);
     // Fecha conexao no sentido de escrita
