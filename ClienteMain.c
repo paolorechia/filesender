@@ -23,6 +23,9 @@
 
 #define PORTA 2048
 #define BUFFER_SIZE 4096
+#define FILENAME_MAXSIZE 200
+#define FILESIZE_MAX 200
+#define HEADER_SIZE FILENAME_MAXSIZE + FILESIZE_MAX
 #define LOCALHOST "127.0.0.1"
 #define LINGER 1
 #define LINGER_TIME 120 
@@ -64,6 +67,7 @@ int main(int argc, char **argv) {
 
 	int size;
 	char buffer[BUFFER_SIZE];
+    char header[HEADER_SIZE];
     char * ACK = "ACKNOWLEDGE";
     FILE * entrada;
     long long fileSize;

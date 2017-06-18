@@ -22,6 +22,9 @@
 /* Usuário linux padrão só pode abrir portas acima de 1024 */
 #define PORTA 2048
 #define BUFFER_SIZE 4096
+#define FILENAME_MAXSIZE 200
+#define FILESIZE_MAXSIZE 200
+#define HEADER_SIZE FILENAME_MAXSIZE + FILESIZE_MAXSIZE
 
 /* Estrutura servidor local */
 struct sockaddr_in local;
@@ -35,6 +38,7 @@ int main(int argc, char **argv) {
 	int client_descritor;
 	int size;
 
+    char header[HEADER_SIZE];
     char buffer[BUFFER_SIZE];
     char * ACK = "ACKNOWLEDGE";
     size_t bytesReceived;
@@ -85,28 +89,18 @@ int main(int argc, char **argv) {
 	}
 
 	/* Enviando mensagem ao cliente */
-	strcpy(buffer, "Bem Vindo! Mande-me: nome do arquivo e numero de blocos"); 
+	strcpy(buffer, "Bem Vindo! Esperando o header...");
 
 	/* Função de envio send - MAN SEND */
 
-    char output_name[BUFFER_SIZE];
+    char output_name[];
     int bytesRead = 0;
 	if(send(client_descritor, buffer, strlen(buffer), 0)) {
-		printf("Esperando nome do arquivo... ");
-        if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
+		printf("Esperando header... ");
+        if((size= recv(client_descritor, header, HEADER_SIZE, 0)) > 0) {
             buffer[size]= '\0';
             sprintf(output_name, "copia_%s", buffer);
 		    printf("%s\n", output_name);
-        }
-	    if(send(client_descritor, ACK, strlen(ACK), 0)){
-        }
-		printf("Esperando tamanho do arquivo cliente... ");
-        if((size= recv(client_descritor, buffer, BUFFER_SIZE, 0)) > 0) {
-            buffer[size]= '\0';
-            fileSize=atoi(buffer);
-            printf("%d\n", fileSize);
-        }
-	    if(send(client_descritor, ACK, strlen(ACK), 0)){
         }
         // Abre arquivo de saida
         saida = fopen(output_name, "wb");
