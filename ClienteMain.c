@@ -5,6 +5,8 @@
  *  Author: possati
  *
  *  CLIENTE...
+ * ****************************** 
+ *  Last modified by Paolo and L. Mateus on June 25, 2017
  */
 
 #include <stdio.h>

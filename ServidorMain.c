@@ -7,6 +7,8 @@
  *	As funções de sockets possuem manual no linux, ex man socket
  *
  *  SERVIDOR...
+ * ****************************** 
+ *  Last modified by Paolo and L. Mateus on June 25, 2017
  */
 
 #include <stdio.h>
