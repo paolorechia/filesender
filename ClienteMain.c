@@ -88,8 +88,6 @@ void buildHeader(char header[HEADER_SIZE],
                  char fileSizeString[FILESIZE_MAXSIZE]){
     padString(filename);
     padString(fileSizeString);
-    printf("%s\n", filename);
-    printf("%s\n", fileSizeString);
     memset(header, 0x0, HEADER_SIZE);
     strcat(header, filename);
     strcat(header, fileSizeString);
