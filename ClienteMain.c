@@ -93,7 +93,7 @@ void buildHeader(char header[HEADER_SIZE],
     memset(header, 0x0, HEADER_SIZE);
     strcat(header, filename);
     strcat(header, fileSizeString);
-    header[HEADER_SIZE]='\0';
+    header[HEADER_SIZE -1]='\0';
 }
 
 struct sockaddr_in remoto;
